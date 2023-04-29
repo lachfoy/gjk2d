@@ -1,0 +1,6 @@
+/.vscode
+/logs
+/*.o
+/*.exe
+/include
+/glad.c
