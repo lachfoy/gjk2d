@@ -38,15 +38,6 @@ private:
     Font mFont;
 
     int mMousePosition[2];
-
-    Shape mShapeA;
-    Shape mShapeB;
-
-    bool mCollision;
-
-    glm::vec3 mBlue = { 75.0f / 255, 77.0f / 255, 227.0f / 255 };
-    glm::vec3 mRed = { 227.0f / 255, 75.0f / 255, 75.0f / 255 };
-    glm::vec3 mCyan = { 75.0f / 255, 227.0f / 255, 224.0f / 255 };
 };
 
 #endif

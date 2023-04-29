@@ -3,55 +3,38 @@
 
 #include <glm/glm.hpp>
 #include <vector>
-#include "Renderer.h"
-#include "TextRenderer.h"
 
-struct Shape
+struct GjkCollider
 {
-    std::vector<glm::vec2> points;
+    virtual glm::vec2 Support(const glm::vec2& dir) const = 0;
+};
 
-    glm::vec2 Support(const glm::vec2& dir) const
-    {
-        glm::vec2 maxPoint;
-		float maxDistance = -FLT_MAX;
- 
-		for (glm::vec2 p : points) {
-			float distance = glm::dot(p, dir);
-			if (distance > maxDistance) {
-				maxDistance = distance;
-				maxPoint = p;
-			}
-		}
- 
-		return maxPoint;
+struct BoxCollider : GjkCollider
+{
+    glm::vec2 min;
+    glm::vec2 max;
+
+    glm::vec2 Support(const glm::vec2& dir) const override {
+        glm::vec2 result;
+        result.x = (dir.x >= 0) ? max.x : min.x;
+        result.y = (dir.y >= 0) ? max.y : min.y;
+        return result;
     }
+};
 
-    glm::vec2 Center() const
-    {
-        glm::vec2 center = glm::vec2(0.0f);
-        for (glm::vec2 p : points) {
-			center += p;
-		}
+struct CircleCollider : GjkCollider
+{
+    glm::vec2 center;
+    float radius;
 
-        center /= points.size();
-
-        return center;
-    }
-
-    void Draw(Renderer& renderer, const glm::vec3& color)
-    {
-        for (size_t i = 0; i < points.size() - 1; i++) {
-
-			renderer.DrawLine(points[i], points[i + 1], color);
-		}
-
-        renderer.DrawLine(points[points.size() - 1], points[0], color);
+    glm::vec2 Support(const glm::vec2& dir) const override {
+        return center + radius * glm::normalize(dir);
     }
 };
 
 glm::vec2 TripleProduct(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c);
 bool Simplex2(std::vector<glm::vec2>& simplex, glm::vec2& dir);
 bool Simplex3(std::vector<glm::vec2>& simplex, glm::vec2& dir);
-bool Gjk(Shape& shapeA, Shape& shapeB);
+bool Gjk(const GjkCollider& colliderA, const GjkCollider& colliderB);
 
 #endif // PHYSICS_H_

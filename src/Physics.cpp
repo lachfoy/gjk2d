@@ -56,13 +56,13 @@ bool Simplex3(std::vector<glm::vec2>& simplex, glm::vec2& dir)
     return false;
 }
 
-bool Gjk(Shape& shapeA, Shape& shapeB)
+bool Gjk(const GjkCollider& colliderA, const GjkCollider& colliderB)
 {
     // get an initial search direction
-    glm::vec2 dir = shapeB.Center() - shapeA.Center();
+    glm::vec2 dir = glm::vec2{ 1.0f, 0.0f };
 
     // get first support point on the minkowski sum
-    glm::vec2 support = shapeA.Support(dir) - shapeB.Support(-dir);
+    glm::vec2 support = colliderA.Support(dir) - colliderB.Support(-dir);
 
     // create the simplex
     std::vector<glm::vec2> simplex = { support };
@@ -71,7 +71,7 @@ bool Gjk(Shape& shapeA, Shape& shapeB)
     dir = -support;
 
     while (true) {
-        glm::vec2 a = shapeA.Support(dir) - shapeB.Support(-dir);
+        glm::vec2 a = colliderA.Support(dir) - colliderB.Support(-dir);
 
         if (glm::dot(a, dir) < 0) { // no intersection case
             return false;

@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cmath> // floor
 
-#include "Colors.h"
 #include <glm/gtx/matrix_transform_2d.hpp>
 
 bool Game::Init()
@@ -146,17 +145,6 @@ void Game::Create()
     mTextRenderer.Init(800, 600);
     mFont.Load("fonts/arial_16px.fnt");
 
-    mShapeA = {};
-    mShapeB = {};
-
-    mShapeB.points = {
-        glm::vec2(392.0f, 129.0f),
-        glm::vec2(174.0f, 229.0f),
-        glm::vec2(205.0f, 410.0f),
-        glm::vec2(420.0f, 468.0f),
-        glm::vec2(581.0f, 304.0f),
-        glm::vec2(542.0f, 164.0f)
-    };
 }
 
 void Game::HandleInput()
@@ -166,25 +154,22 @@ void Game::HandleInput()
 
 void Game::Update(float deltaTime)
 {
-    // make shape A a 100x100 box around the mouse pos
-    mShapeA.points = {
-        glm::vec2(mMousePosition[0] - 50.0f, mMousePosition[1] - 50.0f),
-        glm::vec2(mMousePosition[0] - 50.0f, mMousePosition[1] + 50.0f),
-        glm::vec2(mMousePosition[0] + 50.0f, mMousePosition[1] + 50.0f),
-        glm::vec2(mMousePosition[0] + 50.0f, mMousePosition[1] - 50.0f)
-    };
 
-    mCollision = false;
-
-    if (Gjk(mShapeA, mShapeB)) {
-        mCollision = true;
-    }
 }
 
 void Game::Draw()
 {
-    mShapeA.Draw(mRenderer, mCollision ? mRed : mCyan);
-    mShapeB.Draw(mRenderer, mBlue);
+    glm::vec2 mousePos = glm::vec2{ mMousePosition[0], mMousePosition[1] };
+    glm::vec2 circlePos = glm::vec2{ 400.0f, 300.0f };
+    glm::vec2 boxSize = glm::vec2{ 100.0f, 100.0f };
+
+    BoxCollider box; box.min = mousePos - boxSize * 0.5f; box.max = mousePos + boxSize * 0.5f;
+    CircleCollider circle; circle.center = circlePos; circle.radius = 50.0f;
+
+    bool collision = Gjk(box, circle);
+
+    mRenderer.DrawCircle(circlePos, 50.0f, glm::vec3{ 0.0f, 0.0f, 1.0f });
+    mRenderer.DrawBox(mousePos, boxSize, collision ? glm::vec3{ 1.0f, 0.0f, 0.0f } : glm::vec3{ 0.0f, 1.0f, 0.0f });
 }
 
 void Game::Destroy()
